@@ -1,0 +1,94 @@
+{% extends "layout.html" %}
+
+{% block title %}Dashboard de Análises{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Dashboard Analítico</h1>
+    <p class="lead">Visão geral dos dados de preços de combustíveis.</p>
+</div>
+
+{% if analyses %}
+<div class="row kpi-grid">
+    <div class="col-lg-3 col-md-6">
+        <div class="card kpi-card">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-database"></i> Total de Registros</h5>
+                <p class="kpi-value">{{ "{:,.0f}".format(analyses.kpi_total_registros).replace(",", ".") }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="card kpi-card">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-calendar-alt"></i> Período Analisado</h5>
+                <p class="kpi-value-small">{{ analyses.kpi_data_inicio }} a {{ analyses.kpi_data_fim }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6">
+        <div class="card kpi-card">
+            <div class="card-body">
+                <h5 class="card-title"><i class="fas fa-dollar-sign"></i> Preço Médio Geral</h5>
+                <p class="kpi-value">R$ {{ "%.2f"|format(analyses.kpi_preco_medio_geral) }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<div class="row">
+    <div class="col-lg-12">
+        <div class="card analysis-card">
+            <div class="card-body">
+                <h5 class="card-title">Evolução dos Preços ao Longo do Tempo</h5>
+                <img src="{{ analyses.plot_serie_temporal }}?t={{ now }}" class="img-fluid">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card analysis-card">
+            <div class="card-body">
+                <h5 class="card-title">Distribuição de Preços ({{ analyses.produto_analisado }})</h5>
+                <img src="{{ analyses.plot_distribuicao_precos }}?t={{ now }}" class="img-fluid">
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="card analysis-card">
+            <div class="card-body">
+                <h5 class="card-title text-danger"><i class="fas fa-arrow-up"></i> Top 5 Estados Mais Caros</h5>
+                <ul class="list-group list-group-flush">
+                    {% for estado, preco in analyses.top_5_estados_caros.items() %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ estado }}
+                        <span class="badge badge-danger badge-pill">R$ {{ '%.2f'|format(preco) }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3">
+        <div class="card analysis-card">
+            <div class="card-body">
+                <h5 class="card-title text-success"><i class="fas fa-arrow-down"></i> Top 5 Estados Mais Baratos</h5>
+                <ul class="list-group list-group-flush">
+                    {% for estado, preco in analyses.top_5_estados_baratos.items() %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ estado }}
+                        <span class="badge badge-success badge-pill">R$ {{ '%.2f'|format(preco) }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endif %}
+{% endblock %}
